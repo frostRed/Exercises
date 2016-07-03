@@ -1,0 +1,20 @@
+(define (expmod b n m)
+  (cond ((= n 0) 1)
+        ((even? n)
+         (remainder (square (expmod b (/ n 2) m))
+                    m))
+        (else (remainder (* b (expmod b (- n 1) m))
+                         m))))
+
+(define (fermat-test n)
+  (define (try-it a)
+    
+    (= a (expmod a n n)))
+  (try-it (+ 1 (random (- n 1)))))
+
+(define (fast-prime? n times)
+  (cond ((= times 0) true)
+        ((fermat-test n) (fast-prime? n (- times 1)))
+        (else false)))
+
+(define (square x) (* x x))

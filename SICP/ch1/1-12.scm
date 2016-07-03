@@ -1,0 +1,6 @@
+(define (pascal raw col)
+  (cond ((or (= col 0)
+            (= col raw))
+         1)
+        (else (+ (pascal (- raw 1) (- col 1))
+                 (pascal (- raw 1) col)))))

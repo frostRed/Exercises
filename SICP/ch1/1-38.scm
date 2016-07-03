@@ -1,0 +1,20 @@
+(define (cont-frac-ite n d k)
+  (define (iter count result )
+    (if (= count 0)
+      result
+      (iter (- count 1)
+            (/ (n count)
+               (+ (d count)
+                  result))
+            )))
+  (iter k 0))
+
+(define (test k)
+  (cont-frac-ite (lambda (i) 1.0)
+                (lambda (i)
+                  (cond ((= 0 (remainder (- i 2) 3)) (* 2 (+ 1 (/ (- i 2) 3))))
+                        (else 1)))
+                k))
+
+(define (e k)
+  (+ 2 (test k)))
