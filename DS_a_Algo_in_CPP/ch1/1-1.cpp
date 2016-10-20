@@ -30,13 +30,13 @@ void sort(vector<Compare>& v);
 int main(int argc, char** argv) {
     // N is vector size
     // M is the times to increase vector size
-    int N = std::stoi(argv[1]);
+    int sz = std::stoi(argv[1]);
     int M = std::stoi(argv[2]);
 
-    ofstream out("time", ofstream::app);
+    ofstream out("time", ofstream::out);
 
     for (int i = 0; i != M; ++i) {
-        int sz = N + i * N;
+        sz *= 2;
         vector<double> vd = randN(sz);
         auto start = system_clock::now();
         double result = run(vd);

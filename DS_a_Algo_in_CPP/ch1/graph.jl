@@ -1,8 +1,10 @@
-using Gadfly
-f = open("time")
+#using Gadfly
+using PyPlot
+f = open("time2")
 a = Float64[]
 for ln in eachline(f)
-    n = prase(Float64, ln)
+    n = parse(Float64, ln)
     push!(a, n)
 end
-
+plot(a)
+show()

@@ -14,3 +14,13 @@ add_executable(1-13.cpp ch1/1-13.cpp)
 add_executable(1-14.cpp ch1/1-14.cpp)
 add_executable(1-15.cpp ch1/1-15.cpp)
 add_executable(1-16.cpp ch1/1-16.cpp)
+
+
+add_executable(maxSubSum1.cpp ch2/maxSubSum1.cpp)
+add_executable(maxSubSum2.cpp ch2/maxSubSum2.cpp)
+add_executable(maxSubSum3.cpp ch2/maxSubSum3.cpp)
+add_executable(maxSubSum4.cpp ch2/maxSubSum4.cpp)
+add_executable(2-15.cpp ch2/2-15.cpp)
+add_executable(2-16.cpp ch2/2-16.cpp)
+add_executable(2-18.cpp ch2/2-18.cpp)
+add_executable(2-17-a.cpp ch2/2-17-a.cpp)
