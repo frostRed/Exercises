@@ -24,3 +24,8 @@ add_executable(2-15.cpp ch2/2-15.cpp)
 add_executable(2-16.cpp ch2/2-16.cpp)
 add_executable(2-18.cpp ch2/2-18.cpp)
 add_executable(2-17-a.cpp ch2/2-17-a.cpp)
+
+
+add_executable(Vector.cpp ch3/Vector.cpp)
+add_executable(List.cpp ch3/List.cpp)
+add_executable(Stack_list.cpp ch3/Stack_list.cpp)
