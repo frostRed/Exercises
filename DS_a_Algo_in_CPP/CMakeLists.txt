@@ -26,6 +26,7 @@ add_executable(2-18.cpp ch2/2-18.cpp)
 add_executable(2-17-a.cpp ch2/2-17-a.cpp)
 
 
-add_executable(Vector.cpp ch3/Vector.cpp)
-add_executable(List.cpp ch3/List.cpp)
-add_executable(Stack_list.cpp ch3/Stack_list.cpp)
+add_executable(Container.cpp ch3/Container_test.cpp)
+add_executable(balancingSymbols ch3/balancingSymbols.cpp)
+add_executable(postfixExpr ch3/postfixExpr.cpp)
+add_executable(in2post ch3/infix2postfix.cpp)

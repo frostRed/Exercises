@@ -1,10 +1,14 @@
 //
 // Created by paysonl on 16-10-20.
 //
-#include <cassert>
+
+#ifndef DS_A_ALGO_IN_CPP_VECTOR_H
+#define DS_A_ALGO_IN_CPP_VECTOR_H
+
 #include <initializer_list>
 using std::initializer_list;
 
+// use std::move
 #include <algorithm>
 
 template <typename Object, typename... Args>
@@ -32,6 +36,7 @@ public:
         return *this;
     }
     ~Vector() {delete [] objects;}
+
     Vector(Vector&& rhs): size{rhs.size}, capacity{rhs.capacity}, objects{rhs.objects} {
         rhs.objects = nullptr;
         rhs.size = rhs.capacity = 0;
@@ -103,15 +108,5 @@ private:
     Object* objects;
 };
 
-int main() {
-    Vector<int> v(10);
-    assert(v.sz() == 10);
 
-    Vector<double> v2{1.5, 2, 3, 4, 5};
-    assert(*(v2.begin()) == 1.5);
-
-    auto v3(v2);
-    v3 = v2;
-    auto v4(std::move(v3));
-    v4 = Vector<double>{4, 6, 8};
-}
+#endif //DS_A_ALGO_IN_CPP_LIST_H

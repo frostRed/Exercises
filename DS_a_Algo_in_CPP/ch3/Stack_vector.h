@@ -1,22 +1,23 @@
 //
 // Created by paysonl on 16-10-20.
 //
-#include <cassert>
+
+
+#ifndef DS_A_ALGO_IN_CPP_STACK_VECTOR__H
+#define DS_A_ALGO_IN_CPP_STACK_VECTOR__H
+
 #include <initializer_list>
 using std::initializer_list;
 
+// use std::move
 #include <algorithm>
 
-template <typename Object, typename... Args>
+template <typename Object>
 class Stack {
 public:
+    /////////////// Big Five ///////////////////////
     explicit Stack(int initsize = 0): size{initsize},
                                        capacity{initsize + SPARE_CAPACITY}, objects{new Object[capacity]} {}
-    /*
-    Stack(const Args&... rest):Stack(0) {
-        push_back(rest...);
-    }
-     */
     Stack(const initializer_list<Object>& il): Stack(il.size()) {
         for (int i = 0; i != il.size(); ++i)
             objects[i] = *(il.begin() + i);
@@ -47,25 +48,22 @@ public:
         return *this;
     }
 
-    bool empty() const { return size == 0; }
-    //int sz() const { return size; }
-    //int cap() const { return capacity; }
 
     /////////// Stack API //////////////
+    bool empty() const { return size == 0; }
     void push(const Object& x) {
         if (size == capacity)
             reserve(2 * capacity + 1);
         objects[size++] = x;
     }
     Object pop() {
-        return objects[size--];
+        --size;
+        return objects[size];
     }
     const Object& top() const {
         return objects[size - 1];
     }
     //////////////////////////////////////
-
-
 
 
     static const int SPARE_CAPACITY = 16;
@@ -106,21 +104,6 @@ private:
     const_iterator end() const { return  &objects[size]; }
     const_iterator cbegin() { return &objects[0]; }
     const_iterator cend() {return &objects[size]; }
-
 };
 
-int main() {
-    Stack<int> l{1, 2, 3, 4};
-    auto l2(l);
-    l.push(5);
-    assert(l.top() == 5);
-
-    auto l3(std::move(l2));
-    l3 = std::move(l);
-    assert(l3.top() == 5);
-    l3.pop();
-    assert(l3.top() == 4);
-
-    assert(l3.pop() == 4);
-    assert(l3.top() == 3);
-}
+#endif // DS_A_ALGO_IN_CPP_STACK_VECTOR__H
