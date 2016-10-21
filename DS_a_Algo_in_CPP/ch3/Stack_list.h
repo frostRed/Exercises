@@ -2,10 +2,14 @@
 // Created by paysonl on 16-10-20.
 //
 
-#include <cassert>
+
+#ifndef DS_A_ALGO_IN_CPP_STACK_LIST__H
+#define DS_A_ALGO_IN_CPP_STACK_LIST__H
+
 #include <initializer_list>
 using std::initializer_list;
 
+// use std::move
 #include <algorithm>
 
 
@@ -56,7 +60,6 @@ public:
         Object& retrieve() const { return current->data; }
         const_iterator(Node* p): current{p} {}
     };
-
     class iterator: public const_iterator {
         friend class Stack<Object>;
     public:
@@ -108,8 +111,6 @@ public:
         init();
         for (auto &i: rhs)
             push(i);
-        //for (auto i = rhs.begin(); i != rhs.end(); ++i)
-        //   push_back(*i);
     }
     Stack&operator=(const Stack& rhs) {
         Stack cpy = rhs;
@@ -210,19 +211,5 @@ private:
 
 };
 
-int main() {
-    Stack<int> l{1, 2, 3, 4};
-    auto l2(l);
-    l.push(5);
-    assert(l.top() == 5);
 
-    auto l3(std::move(l2));
-    l3 = std::move(l);
-    assert(l3.top() == 5);
-    l3.pop();
-    assert(l3.top() == 4);
-
-    assert(l3.pop() == 4);
-    assert(l3.top() == 3);
-
-}
+#endif // DS_A_ALGO_IN_CPP_STACK_LIST__H
