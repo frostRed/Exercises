@@ -25,9 +25,15 @@ int main(int argc, char** argv) {
     //string postfix{argv[1]};
 
     // at the front and end of symbols, there must be a blank space
-    string posfix{"a + b * c + ( d * e + f ) * g"};
+    string posfix{"a + b * c  + ( d * e + f ) * g"};
     vector<string> words = split(posfix, " ");
     assert(infix2postfix(words) == "a b c * + d e * f + g * +");
+    string posfix2{"a + b * c ^ d"};
+    vector<string> words2 = split(posfix2, " ");
+    assert(infix2postfix(words2) == "a b c d ^ * +");
+    string posfix3{"a ^ b + c * d"};
+    vector<string> words3 = split(posfix3, " ");
+    assert(infix2postfix(words3) == "a b ^ c d * +");
 }
 
 vector<string> split(const string& line, const string& tag) {
@@ -42,7 +48,7 @@ vector<string> split(const string& line, const string& tag) {
 
 bool is_Syms(const string& s) {
     // these symbols need push to stack
-    if (s == "+" || s == "-" || s == "*" || s == "/" || s == "(" || s == ")")
+    if (s == "+" || s == "-" || s == "*" || s == "/" || s == "^" || s == "(" || s == ")")
         return true;
     return false;
 }
@@ -51,7 +57,7 @@ string infix2postfix(const vector<string>& words) {
     Stack<string> stack;
     for (auto &i: words) {
         if (!is_Syms(i))
-            // i not be + - * / ( )
+            // i not be + - * / ^ ( )
             out << i << " ";
         else if (i == "(")
             stack.push(i);
@@ -60,6 +66,14 @@ string infix2postfix(const vector<string>& words) {
                 out << stack.pop() << " ";
             // remeber pop the (, but not output
             stack.pop();
+        }
+        else if (i == "^") {
+            // if stack.top() is not +  - * / (, should pop() and output
+            while (stack.top().find_first_of("+-*/(") == string::npos &&
+                   !stack.empty())
+                out << stack.pop() << " ";
+            stack.push(i);
+
         }
         else if (i == "*" || i == "/") {
             // if stack.top() is not +  - (, should pop() and output
