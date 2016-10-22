@@ -11,17 +11,20 @@ using std::initializer_list;
 // use std::move
 #include <algorithm>
 
-template <typename Object, typename... Args>
+#include <stdexcept>
+using std::out_of_range;
+using std::logic_error;
+
+template <typename Object, typename ... Args>
 class Vector {
 public:
+    using iterator = Object*;
+    using const_iterator = const Object*;
+
     explicit Vector(int initsize = 0): size{initsize},
                                        capacity{initsize + SPARE_CAPACITY}, objects{new Object[capacity]} {}
-    /*
-    Vector(const Args&... rest):Vector(0) {
-        push_back(rest...);
-    }
-     */
     Vector(const initializer_list<Object>& il): Vector(il.size()) {
+        // Can I complement same function by using Args unpack?
         for (int i = 0; i != il.size(); ++i)
             objects[i] = *(il.begin() + i);
     }
@@ -69,9 +72,13 @@ public:
     }
 
     Object&operator[](int index) {
+        if (index < 0 || index >= size)
+            throw out_of_range("indxing out of range");
         return objects[index];
     }
     const Object&operator[](int index) const {
+        if (index < 0 || index >= size)
+            throw out_of_range("indxing out of range");
         return objects[index];
     }
     bool empty() const { return size == 0; }
@@ -84,14 +91,40 @@ public:
         objects[size++] = x;
     }
     void pop_back() {
+        if (empty())
+            throw logic_error("vector was empty");
         --size;
     }
+    iterator insert(iterator ite, const Object& x) {
+        if (size == capacity)
+            reserve(2 * capacity + 1);
+        ++size;
+        for (iterator pos = end() - 1; pos >= ite; -- pos) {
+            *(pos + 1) = *pos;
+        }
+        *ite = x;
+
+        return ite;
+    }
+    iterator erase(iterator ite) {
+        if (empty())
+            throw logic_error("vector was empty");
+        if (ite == end())
+            throw out_of_range("iterator is out of range");
+        --size;
+        for (iterator pos = ite + 1; ite != end(); ++ite) {
+            *(pos - 1) = *pos;
+        }
+        return ite;
+    }
+   /*
     const Object& back() const {
         return objects[size - 1];
     }
+    */
 
-    using iterator = Object*;
-    using const_iterator = const Object*;
+
+
 
     iterator begin() { return &objects[0]; }
     const_iterator begin() const { return &objects[0]; }

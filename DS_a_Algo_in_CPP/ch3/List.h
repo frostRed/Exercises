@@ -19,6 +19,8 @@ private:
 public:
     class const_iterator;
     class iterator;
+    class const_reverse_iterator;
+    class reverse_iterator;
 
 
     List();
@@ -30,7 +32,6 @@ public:
     List& operator=(List&& rhs) noexcept;
 
 
-
     iterator begin();
     const_iterator begin() const;
     iterator end();
@@ -38,9 +39,17 @@ public:
     const_iterator cbegin();
     const_iterator cend();
 
+    reverse_iterator rbegin();
+    const_reverse_iterator rbegin() const;
+    reverse_iterator rend();
+    const_reverse_iterator rend() const;
+    const_reverse_iterator crbegin();
+    const_reverse_iterator crend();
+
 
     int sz() const;
     bool empty() const;
+    // clear all elements
     void clear();
 
     Object& front();
@@ -48,7 +57,7 @@ public:
     Object& back();
     const Object& back() const;
     void push_front(const Object& x);
-    void push_front(Object&& x);
+    void push_front(Object&& x) ;
     void push_back(const Object& x);
     void push_back(Object&& x);
     void pop_front();
@@ -60,6 +69,8 @@ public:
     iterator erase(iterator ite);
     iterator erase(iterator from, iterator to);
 
+    void splice(iterator position, List<Object>& lst);
+
 
 private:
     int size;
@@ -68,8 +79,8 @@ private:
     void init();
 };
 
-///////////////////////////////
-///////////////////////////////
+/////////////////////////////////
+//////// Implements ////////////
 ///////////////////////////////
 
 template <typename Object>
@@ -84,39 +95,56 @@ class List<Object>::Node {
 };
 
 
-////////////////////////
+//////////// Iterator ////////////
 template <typename Object>
 class List<Object>::const_iterator {
     friend class List<Object>;
+    // arguments are base class reference, so iterator instance can also use these
     friend bool operator==(const const_iterator& lhs, const const_iterator& rhs) {
         return lhs.current == rhs.current;
     }
     friend bool operator!=(const const_iterator& lhs, const const_iterator& rhs) {
         return !(lhs == rhs);
     }
+    friend int operator-(const const_iterator&lhs, const const_iterator& rhs) {
+        // lhs must be ahead of rhs
+        int ret = 0;
+        auto left = rhs;
+        while (left != lhs) {
+            ++ left;
+            ++ret;
+        }
+        return ret;
 
+    }
 
 public:
     const_iterator(): current{nullptr} {}
 
-    const Object&operator*() const { return retrieve(); }
-    const_iterator&operator++() {
+    const Object& operator*() const { return retrieve(); }
+    const_iterator& operator++() {
         current = current->next;
         return *this;
     }
-    const_iterator&operator++(int) {
+    const_iterator& operator++(int) {
         const_iterator old = *this;
         ++(*this);
         return old;
     }
-    const_iterator&operator--() {
+    const_iterator& operator--() {
         current = current->prev;
         return *this;
     }
-    const_iterator&operator--(int) {
+    const_iterator& operator--(int) {
         const_iterator old = *this;
         --(*this);
         return old;
+    }
+    const_iterator operator+(int k) const {
+        auto ret = *this;
+        for (int i = 0; i != k; ++i)
+            ++ret;
+        return ret;
     }
 
 protected:
@@ -158,12 +186,101 @@ public:
         --(*this);
         return old;
     }
+    iterator operator+(int k) const {
+        auto ret = *this;
+        for (int i = 0; i != k; ++i)
+            ++ret;
+        return ret;
+    }
+
 protected:
     iterator(Node *p): const_iterator(p) {}
 };
 
 
-/////////// List implement ////////////
+//////////// reverse iterator ////////////
+template <typename Object>
+class List<Object>::const_reverse_iterator: public const_iterator {
+    friend class List<Object>;
+
+public:
+    const_reverse_iterator()  {}
+
+    const_reverse_iterator& operator++() {
+        this->current = this->current->prev;
+        return *this;
+    }
+    const_reverse_iterator& operator++(int) {
+        const_iterator old = *this;
+        ++(*this);
+        return old;
+    }
+    const_reverse_iterator& operator--() {
+        this->current = this->current->next;
+        return *this;
+    }
+    const_reverse_iterator& operator--(int) {
+        const_iterator old = *this;
+        --(*this);
+        return old;
+    }
+    const_reverse_iterator operator+(int k) const {
+        auto ret = *this;
+        for (int i = 0; i != k; ++i)
+            ++ret;
+        return ret;
+    }
+
+protected:
+    const_reverse_iterator(Node* p): const_iterator{p} {}
+};
+
+
+template <typename Object>
+class List<Object>::reverse_iterator: public const_reverse_iterator {
+    friend class List<Object>;
+public:
+    reverse_iterator() {}
+    Object& operator*() {
+        return const_reverse_iterator::retrieve();
+    }
+    const Object& operator*() const {
+        return const_reverse_iterator::operator*();
+    }
+
+    reverse_iterator& operator++() {
+        //current = current->next;
+        this->current = this->current->prev;
+        return *this;
+    }
+    reverse_iterator&operator++(int) {
+        iterator old = *this;
+        ++(*this);
+        return old;
+    }
+    reverse_iterator&operator--() {
+        //current = current->next;
+        this->current = this->current->next;
+        return *this;
+    }
+    reverse_iterator&operator--(int) {
+        iterator old = *this;
+        --(*this);
+        return old;
+    }
+    reverse_iterator operator+(int k) const {
+        auto ret = *this;
+        for (int i = 0; i != k; ++i)
+            ++ret;
+        return ret;
+    }
+
+protected:
+    reverse_iterator(Node *p): const_reverse_iterator(p) {}
+};
+
+///////////////// List methods //////////////////////
+////////////////////////////////////////////////////
 template <typename Object>
 void List<Object>::init() {
     size = 0;
@@ -213,7 +330,11 @@ List<Object>::List(List&& rhs) noexcept : size{rhs.size}, head{rhs.head}, tail{r
 template <typename Object>
 List<Object>& List<Object>::operator=(List&& rhs) noexcept {
     if (this != &rhs) {
+        // remember free all nodes, include head and tail
         clear();
+        delete head;
+        delete tail;
+
         size = rhs.size;
         head = rhs.head;
         tail = rhs.tail;
@@ -225,6 +346,7 @@ List<Object>& List<Object>::operator=(List&& rhs) noexcept {
     return *this;
 }
 
+///////////// iterator methods //////////////
 template <typename Object>
 typename List<Object>::iterator List<Object>::begin() { return iterator(head->next); }
 
@@ -243,7 +365,27 @@ typename List<Object>::const_iterator List<Object>::cbegin() { return const_iter
 template <typename Object>
 typename List<Object>::const_iterator List<Object>::cend() { return const_iterator(tail); }
 
+////////////// reverse iterator methods //////////////
+template <typename Object>
+typename List<Object>::reverse_iterator List<Object>::rbegin() { return reverse_iterator(tail->prev); }
 
+template <typename Object>
+typename List<Object>::const_reverse_iterator List<Object>::rbegin() const { return const_reverse_iterator(tail->prev); }
+
+template <typename Object>
+typename List<Object>::reverse_iterator List<Object>::rend() { return reverse_iterator(head); }
+
+template <typename Object>
+typename List<Object>::const_reverse_iterator List<Object>::rend() const { return reverse_iterator(head); }
+
+template <typename Object>
+typename List<Object>::const_reverse_iterator List<Object>::crbegin() { return const_reverse_iterator(tail->prev); }
+
+template <typename Object>
+typename List<Object>::const_reverse_iterator List<Object>::crend() { return const_reverse_iterator(head); }
+
+
+///////////////////////////
 template <typename Object>
 int List<Object>::sz() const { return size; }
 
@@ -327,6 +469,23 @@ template <typename Object>
 typename List<Object>::iterator List<Object>::erase(iterator from, iterator to) {
     for (iterator itr = from; itr != to; ++itr)
         itr = erase(itr);
+}
+
+template <typename Object>
+void List<Object>::splice(iterator position, List<Object> &lst) {
+    Node* pos = position.current;
+
+    pos->prev->next = lst.head->next;
+    lst.head->next->prev = pos->prev;
+
+    pos->prev = lst.tail->prev;
+    lst.tail->prev->next = pos;
+
+    lst.head->next = lst.tail;
+    lst.tail->prev = lst.head;
+
+    size += lst.size;
+    lst.size = 0;
 }
 
 
